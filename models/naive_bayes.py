@@ -3,9 +3,10 @@ from sklearn.model_selection import train_test_split
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.metrics import accuracy_score, classification_report
+import joblib
 
 # Step 1: Load the dataset
-csv_file = "emails.csv"  # Update with the actual file path
+csv_file = "..data/emails.csv"  # Update with the actual file path
 df = pd.read_csv(csv_file)
 
 # Step 2: Extract features and labels
@@ -30,3 +31,9 @@ accuracy = accuracy_score(y_test, y_pred)
 print(f"Accuracy: {accuracy:.2f}")
 print("Classification Report:")
 print(classification_report(y_test, y_pred))
+
+# Save the model and vectorizer
+joblib.dump(model, "naives_bayes_model.pkl")
+joblib.dump(vectorizer, "nb_tfidf_vectorizer.pkl")
+
+print("Model and vectorizer saved successfully!")
