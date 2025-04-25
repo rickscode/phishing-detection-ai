@@ -1,6 +1,6 @@
 import os
 import gradio as gr
-import pickle
+import joblib
 from dotenv import load_dotenv
 from groq import Groq
 import numpy as np
@@ -11,16 +11,16 @@ GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 
 # Load ML Models and Vectorizers
 with open("logistic_regression_model.pkl", "rb") as f:
-    logistic_model = pickle.load(f)
+    logistic_model = joblib.load(f)
 
 with open("tfidf_vectorizer.pkl", "rb") as f:
-    logistic_vectorizer = pickle.load(f)
+    logistic_vectorizer = joblib.load(f)
 
 with open("naives_bayes_model.pkl", "rb") as f:
-    nb_model = pickle.load(f)
+    nb_model = joblib.load(f)
 
 with open("nb_tfidf_vectorizer.pkl", "rb") as f:
-    nb_vectorizer = pickle.load(f)
+    nb_vectorizer = joblib.load(f)
 
 # Initialize Groq Client
 client = Groq(api_key=GROQ_API_KEY)
@@ -33,9 +33,7 @@ def build_prompt(email_text):
 You are a cybersecurity assistant. Please classify the following email as either 'Spam' or 'Ham' (not spam).
 
 Email:
-"""
 {email_text}
-"""
 
 Your answer must be just one word: Spam or Ham.
 """

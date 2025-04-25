@@ -12,7 +12,7 @@ GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 client = Groq(api_key=GROQ_API_KEY)
 
 # Choose model
-LLM_MODEL = "llama3-8b-8192"  # You can also try "llama3-70b-8192"
+LLM_MODEL = "llama3-8b-8192"
 
 # Prompt builder — LLM gets only email text
 def build_prompt(email_text):
