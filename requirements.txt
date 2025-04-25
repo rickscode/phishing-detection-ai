@@ -4,3 +4,4 @@ joblib
 groq
 tqdm
 python-dotenv
+gradio
