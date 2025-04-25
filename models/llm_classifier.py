@@ -12,9 +12,9 @@ GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 client = Groq(api_key=GROQ_API_KEY)
 
 # Choose model
-LLM_MODEL = "llama3-8b-8192"  # Can change to "llama3-70b-8192" if needed
+LLM_MODEL = "llama3-8b-8192"  # You can also try "llama3-70b-8192"
 
-# Prompt builder
+# Prompt builder — LLM gets only email text
 def build_prompt(email_text):
     return f"""
 You are a cybersecurity assistant. Please classify the following email as either 'Spam' or 'Ham' (not spam).
@@ -27,11 +27,17 @@ Email:
 Your answer must be just one word: Spam or Ham.
 """
 
-# Load sample emails
-df = pd.read_csv("emails.csv")
-df = df[['text', 'label']].sample(n=10, random_state=42)
+# Load dataset
+full_df = pd.read_csv("emails.csv")
 
-# Classify using Groq LLM
+# Randomly sample N emails
+sample_df = full_df.sample(n=10, random_state=42).reset_index(drop=True)
+
+# Extract text for classification, keep actual labels for comparison
+email_texts = sample_df['text']
+true_labels = sample_df['label']
+
+# LLM classification function
 def classify_with_groq(email_text):
     chat_completion = client.chat.completions.create(
         model=LLM_MODEL,
@@ -43,20 +49,21 @@ def classify_with_groq(email_text):
     )
     return chat_completion.choices[0].message.content.strip()
 
-# Run classification loop
+# Classify all emails
 results = []
-print("🧠 Running Zero-Shot LLM Spam Detection...\n")
+print("Running Zero-Shot Spam Detection...\n")
 
-for _, row in tqdm(df.iterrows(), total=len(df)):
-    prediction = classify_with_groq(row["text"])
+for text, actual_label in tqdm(zip(email_texts, true_labels), total=len(email_texts)):
+    prediction = classify_with_groq(text)
     results.append({
-        "actual": row["label"],
+        "actual": actual_label,
         "predicted": prediction
     })
 
 # Save predictions
 output_df = pd.DataFrame(results)
 output_path = "../results/llm_predictions.csv"
+os.makedirs("../results", exist_ok=True)
 output_df.to_csv(output_path, index=False)
 
-print(f"\n✅ LLM predictions saved to: {output_path}")
+print(f"\n LLM predictions saved to: {output_path}")
